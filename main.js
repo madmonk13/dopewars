@@ -150,4 +150,9 @@
   P.init(canvas);
   setView(["palm", "screen", "modern"].includes(saved) ? saved : "palm");
   P.loadImages().then(launch);
+
+  // ---------------------------------------------------------------- installable app (offline)
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    navigator.serviceWorker.register("sw.js").catch((e) => console.warn("service worker:", e));
+  }
 })();
