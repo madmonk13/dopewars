@@ -1,23 +1,53 @@
-// Device shell: scaling, silkscreen/hardware buttons, keyboard, and a tiny launcher.
+// Device shell: scaling, silkscreen/hardware buttons, keyboard, a tiny launcher, and the
+// Palm / Screen / Modern view picker.
 (function () {
   "use strict";
   const P = PalmOS;
   const canvas = document.getElementById("screen");
   const kbd = document.getElementById("kbd");
+  const app = document.getElementById("app");
+  const stage = document.querySelector(".stage");
+  const VIEW_KEY = "dopewars-2.4.6/view";
+  let view = "palm";
   let running = false;
 
   // ---------------------------------------------------------------- scale to fit
   function fit() {
-    const availW = Math.min(window.innerWidth - 32, 900);
-    const availH = window.innerHeight - 32;
-    // device is roughly 1.15 screen widths wide and 1.9 screen heights tall
-    let s = Math.min(availW / (160 * 1.15), availH / (160 * 1.9));
+    let s;
+    if (view === "screen") {
+      const cs = getComputedStyle(stage);
+      const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 4;
+      const h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4;
+      s = Math.min(w / 160, h / 160);
+    } else {
+      const availW = Math.min(window.innerWidth - 32, 900);
+      const availH = window.innerHeight - 32 - 50; // 50: style picker under the device
+      // device is roughly 1.15 screen widths wide and 1.9 screen heights tall
+      s = Math.min(availW / (160 * 1.15), availH / (160 * 1.9));
+    }
     // whole-number scaling keeps pixels crisp; small phones get a fractional scale instead of 1x
     s = s >= 2 ? Math.min(Math.floor(s), 5) : Math.max(1, s);
     document.documentElement.style.setProperty("--s", s);
   }
   window.addEventListener("resize", fit);
-  fit();
+
+  // ---------------------------------------------------------------- view picker
+  function setView(v) {
+    view = v;
+    app.classList.toggle("palm", v === "palm");
+    app.classList.toggle("screen", v === "screen");
+    app.classList.toggle("modern", v === "modern");
+    document.querySelectorAll(".style-bar [data-view]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.view === v)));
+    const css = getComputedStyle(document.documentElement);
+    document.querySelector('meta[name="theme-color"]').content = (v === "modern" ? css.getPropertyValue("--m-bg") : css.getPropertyValue("--bg")).trim();
+    try { localStorage.setItem(VIEW_KEY, v); } catch (e) { /* private mode */ }
+    ModernView.setEnabled(v === "modern");
+    fit();
+  }
+  document.querySelectorAll(".style-bar [data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+  // Modern style shows its own launcher while the app isn't running (after Home)
+  document.getElementById("mlauncherIcon").src = (PRC.bitmaps.Tbmp_9502["8"] || PRC.bitmaps.Tbmp_9502["1"]).src;
+  const setRunning = (r) => { running = r; app.classList.toggle("idle", !r); };
 
   // ---------------------------------------------------------------- launcher (Home)
   const ICON = { x: 10, y: 22, w: 36, h: 44 };
@@ -42,14 +72,15 @@
   };
 
   async function launch() {
-    running = true;
+    if (running) return;
+    setRunning(true);
     P.clearScreen();
     try {
       await DopeWars.PilotMain();
     } catch (e) {
       console.error(e);
     }
-    running = false;
+    setRunning(false);
     drawLauncher();
   }
 
@@ -64,6 +95,7 @@
       e.preventDefault();
       const act = b.dataset.act;
       if (act === "home") home();
+      else if (act === "launch") launch();
       else if (act === "menu" && running) P.openMenu();
       else if (act === "abc" || act === "123") openKeyboard(act === "123");
       else if (act === "up") P.scroll(-1);
@@ -74,7 +106,7 @@
   // ---------------------------------------------------------------- keyboard
   document.addEventListener("keydown", (e) => {
     if (!running || e.metaKey) return;
-    if (e.target === kbd) return;
+    if (e.target === kbd || e.target.matches("input, textarea, button")) return;
     if ((e.ctrlKey || e.altKey) && /^[a-z]$/i.test(e.key)) {
       if (P.menuShortcut(e.key)) e.preventDefault();
       return;
@@ -112,6 +144,9 @@
   window.addEventListener("pagehide", save);
 
   // ---------------------------------------------------------------- boot
+  let saved = "palm";
+  try { saved = localStorage.getItem(VIEW_KEY) || "palm"; } catch (e) { /* private mode */ }
   P.init(canvas);
+  setView(["palm", "screen", "modern"].includes(saved) ? saved : "palm");
   P.loadImages().then(launch);
 })();

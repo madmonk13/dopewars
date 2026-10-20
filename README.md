@@ -5,9 +5,15 @@ A browser recreation of **DopeWars 2.4.6 for Palm OS** (Matthew Lee / Michael Ha
 function-by-function port of the app's 68k machine code, so prices, odds, wording and the
 original's bugs all match the Palm version.
 
-This folder holds the source for the full **Palm device** version (`index.html`). The phone-friendly
-**game-only** page, which has the Classic/Modern style switch, is built from these same files into
-one self-contained `../game-only/index.html`.
+This folder holds the source for the full version (`index.html`). A picker under the game switches
+between three views, and the choice is remembered:
+
+* **Palm** (default): an m515-style device with Graffiti area, silkscreen buttons and a launcher.
+* **Screen**: just the 160×160 Palm screen, scaled to fill the window.
+* **Modern**: a restyled HTML interface (see below).
+
+The phone-friendly **game-only** page (Classic/Modern only, no device) is built from these same
+files into one self-contained `../game-only/index.html`.
 
 ## Run it
 
@@ -23,12 +29,12 @@ Then open <http://127.0.0.1:8246/>.
 
 | File | What it is |
 |---|---|
-| `index.html`, `style.css`, `main.js` | The device version: an m515-style Palm body with Graffiti area, silkscreen buttons (Home, Menu, abc/123), scroll rocker, a small app launcher, scaling and keyboard input. |
+| `index.html`, `style.css`, `main.js` | The page: an m515-style Palm body with Graffiti area, silkscreen buttons (Home, Menu, abc/123), scroll rocker, a small app launcher, the Palm/Screen/Modern picker, scaling and keyboard input. |
 | `game.js` | The game: one JavaScript function per original C function (`initGame`, `DoTravel`, `FuzzEncounter`, `NegotiateBuy`, …), with code addresses in comments. Saves to `localStorage`. |
 | `palmos.js` | A small Palm OS 3.5 UI layer providing just the calls the game makes (forms, controls, fields, alerts, Tips, menus, events, `SysRandom`), drawn into a 160×160 canvas. Modal calls such as `FrmAlert` return Promises and run nested event loops, like the real ones. |
 | `font.js` | Hand-drawn pixel fonts at Palm metrics (Std, Bold, Large). |
 | `data.js` | **Generated**: forms, alerts, menus, help text, bitmaps and the random-event table extracted from the PRC. Don't edit it; regenerate with `tools/build_data.py`. |
-| `modern.js` | The **Modern** style for the game-only page (not loaded by `index.html`). |
+| `modern.js` | The **Modern** view, shared with the game-only page. |
 
 ## Modern style
 
@@ -62,7 +68,8 @@ node tests/sim.js 200                    # headless checks + a bot that plays 20
 ```
 
 The game-only page's layout, CSS and style switch live in `tools/game_only_template.html`.
-Rebuild it after changing anything in this folder.
+Rebuild it after changing anything in this folder. The Modern CSS is duplicated there and in
+`style.css`, so change both.
 
 ## Controls (device version)
 
@@ -70,7 +77,8 @@ Rebuild it after changing anything in this folder.
   phone, tap a field or **abc**/**123**.
 * **Menu** or tapping the title bar opens the menus. Ctrl+N / Ctrl+S / Ctrl+V are the command
   strokes.
-* **Home** saves and quits to the launcher.
+* **Home** saves and quits to the launcher. In the Modern view the launcher is a Play screen.
+* The picker is remembered under the `localStorage` key `dopewars-2.4.6/view`.
 * Hidden cheat from the original: write `¥` (Option-Y on a Mac), then a letter.
 
 See `../notes/REVERSE_ENGINEERING.md` for the full game rules, formulas and code addresses.
