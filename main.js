@@ -18,15 +18,16 @@
       const cs = getComputedStyle(stage);
       const w = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 4;
       const h = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - 4;
-      s = Math.min(w / 160, h / 160);
+      // fill the window: largest square that fits, fractional scale allowed
+      s = Math.max(1, Math.min(w / 160, h / 160));
     } else {
       const availW = Math.min(window.innerWidth - 32, 900);
       const availH = window.innerHeight - 32 - 50; // 50: style picker under the device
       // device is roughly 1.15 screen widths wide and 1.9 screen heights tall
       s = Math.min(availW / (160 * 1.15), availH / (160 * 1.9));
+      // whole-number scaling keeps pixels crisp; small phones get a fractional scale instead of 1x
+      s = s >= 2 ? Math.min(Math.floor(s), 5) : Math.max(1, s);
     }
-    // whole-number scaling keeps pixels crisp; small phones get a fractional scale instead of 1x
-    s = s >= 2 ? Math.min(Math.floor(s), 5) : Math.max(1, s);
     document.documentElement.style.setProperty("--s", s);
   }
   window.addEventListener("resize", fit);
