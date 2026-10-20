@@ -5,6 +5,8 @@ A browser recreation of **DopeWars 2.4.6 for Palm OS** (Matthew Lee / Michael Ha
 function-by-function port of the app's 68k machine code, so prices, odds, wording and the
 original's bugs all match the Palm version.
 
+**▶ [Play it](https://madmonk13.github.io/dopewars/)**
+
 This folder holds the source for the full version (`index.html`). A picker under the game switches
 between three views, and the choice is remembered:
 
