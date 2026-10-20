@@ -207,8 +207,13 @@ button:not(:disabled):active { transform: scale(.98); }
 .splash h1 { font-size: 32px; font-weight: 800; margin: 10px 0 6px !important; }
 .splash p { color: var(--m-muted); }
 .splash .dock { width: 100%; }
+.credits { margin: 10px 0 0; display: grid; gap: 2px; font-size: 14px; line-height: 1.35; }
+.credits dt { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--m-muted); margin-top: 6px; }
+.credits dt:first-child { margin-top: 0; }
+.credits dd { margin: 0; }
 .pixel { image-rendering: pixelated; image-rendering: crisp-edges; }
 .hero { width: 134px; height: auto; }
+@media (max-height: 760px) { .hero { width: 96px; } .splash h1 { margin: 6px 0 2px !important; } }
 .card, .result { background: var(--m-surface); border-radius: var(--m-radius); box-shadow: var(--m-shadow); padding: 16px; display: grid; gap: 8px; }
 .result span { font-size: 12px; font-weight: 650; text-transform: uppercase; letter-spacing: .05em; color: var(--m-muted); }
 .result b { font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; }

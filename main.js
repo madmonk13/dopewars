@@ -47,6 +47,7 @@
   }
   document.querySelectorAll(".style-bar [data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
   // Modern style shows its own launcher while the app isn't running (after Home)
+  document.getElementById("mlauncherCredits").outerHTML = ModernView.credits;
   document.getElementById("mlauncherIcon").src = (PRC.bitmaps.Tbmp_9502["8"] || PRC.bitmaps.Tbmp_9502["1"]).src;
   const setRunning = (r) => { running = r; app.classList.toggle("idle", !r); };
 

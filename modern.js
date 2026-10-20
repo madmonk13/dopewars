@@ -13,6 +13,11 @@
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const drugNames = PRC.forms[1003].objects.filter((o) => o.kind === "control" && o.id >= 2000 && o.id <= 2007).map((o) => o.text);
   const send = (controlID) => P.EvtAddEvent({ eType: P.ev.ctlSelectEvent, controlID });
+  const CREDITS = `<dl class="credits">
+      <dt>Original concept</dt><dd>“Drug Wars” by John E. Dell</dd>
+      <dt>Palm version</dt><dd>Created by Matthew Lee<br>Updated by Michael Hallett (2.4.6)</dd>
+      <dt>Web port</dt><dd>Jeff Ulicny</dd>
+    </dl>`;
   const imgSrc = (id) => { const b = PRC.bitmaps["Tbmp_" + id]; return b ? (b["8"] || b["1"]).src : ""; };
 
   // ---------------------------------------------------------------- helpers over captured text
@@ -100,10 +105,13 @@
       else lines.push(o.text.trim());
     }
     const [title, ...rest] = lines;
+    // the form's own credit lines are replaced by the full credits (version/date lines stay)
+    const info = rest.filter((l) => !/^(created|updated|based|web port) /i.test(l));
     return `<div class="splash">
       <img class="pixel hero" src="${imgSrc(9502)}" alt="">
       <h1>${esc(title || "DopeWars")}</h1>
-      ${rest.map((l) => `<p>${esc(l)}</p>`).join("")}
+      ${info.map((l) => `<p>${esc(l)}</p>`).join("")}
+      ${CREDITS}
       <footer class="dock"><button class="btn primary big" data-ctl="9999">Continue</button></footer>
     </div>`;
   }
@@ -264,6 +272,7 @@
   });
 
   window.ModernView = {
+    credits: CREDITS,
     setEnabled(on) {
       enabled = on;
       lastSig = "";

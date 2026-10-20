@@ -22,7 +22,9 @@ self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
   e.respondWith(
-    fetch(req)
+    // "no-cache" revalidates with the server (a cheap 304 when unchanged), so the browser's
+    // HTTP cache can't hand back an old file after an update
+    fetch(req, { cache: "no-cache" })
       .then((res) => {
         if (res.ok) {
           const copy = res.clone();

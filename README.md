@@ -17,6 +17,12 @@ between three views, and the choice is remembered:
 The phone-friendly **game-only** page (Classic/Modern only, no device) is built from these same
 files into one self-contained `../game-only/index.html`.
 
+## Credits
+
+* **Original concept:** “Drug Wars” by John E. Dell
+* **Palm version:** created by Matthew Lee; updated by Michael Hallett (2.4.6)
+* **Web port:** Jeff Ulicny
+
 ## Run it
 
 No build step; it's plain HTML and JavaScript.
